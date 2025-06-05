@@ -1,7 +1,7 @@
 import Redis from "ioredis";
 
 // Create a connection instance
-const redis = new Redis({
+export const redis = new Redis({
   host: "redis-12535.c239.us-east-1-2.ec2.redns.redis-cloud.com",
   port: 12535,
   username: "default",
