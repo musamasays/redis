@@ -36,7 +36,7 @@ app.post("/add-job", async (req, res) => {
   }
 
   try {
-    await queue.add("processReview", {
+    await queue.add("myQueue", {
       review_id,
       image_url,
     });
