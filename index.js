@@ -31,6 +31,8 @@ app.use(express.json());
 app.post("/add-job", async (req, res) => {
   const { key, review_id, image_url } = req.body;
 
+  console.log("key", key, process.env.KEY);
+
   if (key !== process.env.KEY) {
     return res.status(401).json({ error: "Unauthorized" });
   }
