@@ -29,7 +29,11 @@ app.use(express.json());
 
 // 📬 POST endpoint to add job to queue
 app.post("/add-job", async (req, res) => {
-  const { review_id, image_url } = req.body;
+  const { key, review_id, image_url } = req.body;
+
+  if (key !== process.env.KEY) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
   if (!review_id || !image_url) {
     return res.status(400).json({ error: "Missing review_id or image_url" });
