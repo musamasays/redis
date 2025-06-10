@@ -18,12 +18,12 @@ async function uploadToImageKit(imageUrl, reviewId) {
     formData.append("fileName", `${reviewId || "image"}-${Date.now()}.jpg`);
     formData.append("useUniqueFileName", "true");
 
-    const response = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
+    const response = await fetch(process.env.IMAGEKIT_URL, {
       method: "POST",
       headers: {
         Authorization:
           "Basic " +
-          Buffer.from("private_GExVQvnuIrz00mR5vBR7CTdTxDU=" + ":").toString("base64"),
+          Buffer.from(process.env.IMAGEKIT_PRIVATE_KEY + ":").toString("base64"),
       },
       body: formData,
     });
