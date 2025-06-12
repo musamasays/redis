@@ -61,12 +61,11 @@ const imageWorker = new Worker(
             return;
         }
 
-        // Check if photo already exists
+        // Check if review already exists
         const { data: existingPhoto, error: photoLookupError } = await supabase
             .from("reviews")
             .select("id")
             .eq("google_review_id", reviewId)
-            .eq("profile_photo_url", imageKitUrl)
             .maybeSingle();
 
         if (photoLookupError) {
@@ -75,49 +74,46 @@ const imageWorker = new Worker(
         }
 
         if (existingPhoto) {
-            console.log("📷 Photo does exist. Updating to Supabase...");
+            console.log("📷 Photo exists. Updating in Supabase...");
 
-            const photoData = {
-                profile_photo_url: imageKitUrl,
-                google_place_id: 'null',
-                google_review_id: 'null',
-                author_title: 'null',
-                author_url: 'null',
-                rating: 1,
-                text: 'null',
-                review_timestamp: 'null',
-                language: 'null',
-                location_city: 'null',
-                location_zip: 'null',
-                pagination_id: 'null',
-                owner_response: 'null'
-            };
-
-            const { error: photoInsertError } = await supabase
+            const { error: photoUpdateError } = await supabase
                 .from("reviews")
-                .update(photoData)
+                .update({ profile_photo_url: imageKitUrl })
                 .eq("google_review_id", reviewId);
 
-            if (photoInsertError) {
-                console.error("❌ Error updating review photo:", photoInsertError);
+            if (photoUpdateError) {
+                console.error("❌ Error updating review photo:", photoUpdateError);
             } else {
                 console.log(`✅ Updated ImageKit photo for review ${reviewId}`);
             }
         } else {
-            console.log("⚠️ Photo does not exist in Supabase.");
+            console.log("⚠️ Photo does not exist in Supabase. Inserting new row...");
+
+            // Insert full NOT NULL required fields
             const photoData = {
                 profile_photo_url: imageKitUrl,
                 google_review_id: reviewId,
+                google_place_id: '',
+                author_title: '',
+                author_url: '',
+                rating: 0, // default rating
+                text: '',
+                review_timestamp: new Date().toISOString(), // ISO date string
+                language: 'en',
+                location_city: '',
+                location_zip: '',
+                pagination_id: '',
+                owner_response: ''
             };
 
             const { error: photoInsertError } = await supabase
                 .from("reviews")
-                .insert(photoData)
+                .insert(photoData);
 
             if (photoInsertError) {
-                console.error("❌ Error updating review photo:", photoInsertError);
+                console.error("❌ Error inserting review photo:", photoInsertError);
             } else {
-                console.log(`✅ Updated ImageKit photo for review ${reviewId}`);
+                console.log(`✅ Inserted ImageKit photo for review ${reviewId}`);
             }
         }
     },
