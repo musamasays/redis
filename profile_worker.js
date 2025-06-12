@@ -83,7 +83,7 @@ const imageWorker = new Worker(
                 google_review_id: 'null',
                 author_title: 'null',
                 author_url: 'null',
-                rating: 'null',
+                rating: 1,
                 text: 'null',
                 review_timestamp: 'null',
                 language: 'null',
