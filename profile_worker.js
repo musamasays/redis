@@ -93,6 +93,20 @@ const imageWorker = new Worker(
       }
     } else {
       console.log("⚠️ Photo does not exist in Supabase.");
+      const photoData = {
+        profile_photo_url: imageKitUrl,
+        google_review_id: reviewId,
+      };
+
+      const { error: photoInsertError } = await supabase
+        .from("reviews")
+        .insert(photoData)
+
+      if (photoInsertError) {
+        console.error("❌ Error updating review photo:", photoInsertError);
+      } else {
+        console.log(`✅ Updated ImageKit photo for review ${reviewId}`);
+      }
     }
   },
   {
