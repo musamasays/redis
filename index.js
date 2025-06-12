@@ -18,7 +18,10 @@ const redis = new Redis({
 redis.on("error", (err) => console.error("❌ Redis Client Error:", err));
 
 // 🐮 BullMQ Queue setup
-const queue = new Queue("myQueue", { connection: redis });
+const queues = {
+  myQueue: new Queue("myQueue", { connection: redis }),
+  profileImage: new Queue("profileImage", { connection: redis }),
+};
 
 // 🚀 Express setup
 const app = express();
@@ -35,14 +38,14 @@ const authMiddleware = (req, res, next) => {
 
 // 📦 Generic Job Adder
 const addJobToQueue = async (queueName, data) => {
-  try {
-    await queue.add(queueName, data);
-    console.log(`✅ Job added to queue "${queueName}"`, data);
-    return { success: true, message: "Job added to queue" };
-  } catch (error) {
-    console.error(`❌ Failed to add job to queue "${queueName}":`, error);
-    throw error;
+  const queue = queues[queueName];
+  if (!queue) {
+    throw new Error(`Queue "${queueName}" not found`);
   }
+
+  await queue.add(queueName, data);
+  console.log(`✅ Job added to queue "${queueName}"`, data);
+  return { success: true, message: `Job added to queue "${queueName}"` };
 };
 
 // 🚚 Generic POST handler
@@ -56,7 +59,8 @@ const jobHandler = (queueName) => async (req, res) => {
   try {
     const result = await addJobToQueue(queueName, { review_id, image_url });
     res.status(200).json(result);
-  } catch {
+  } catch (error) {
+    console.error(`❌ Failed to add job to queue "${queueName}":`, error);
     res.status(500).json({ error: "Failed to add job" });
   }
 };
