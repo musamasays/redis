@@ -74,8 +74,8 @@ const imageWorker = new Worker(
       return;
     }
 
-    if (!existingPhoto) {
-      console.log("📷 Photo does not exist. Inserting to Supabase...");
+    if (existingPhoto) {
+      console.log("📷 Photo does exist. Updating to Supabase...");
 
       const photoData = {
         profile_photo_url: imageKitUrl,
@@ -92,7 +92,7 @@ const imageWorker = new Worker(
         console.log(`✅ Updated ImageKit photo for review ${reviewId}`);
       }
     } else {
-      console.log("⚠️ Photo already exists in Supabase.");
+      console.log("⚠️ Photo does not exist in Supabase.");
     }
   },
   {
