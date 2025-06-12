@@ -7,7 +7,7 @@ import FormData from "form-data";
 // Supabase setup
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
+  process.env.SUPABASE_SERVICE_KEY
 );
 
 // ImageKit upload function
